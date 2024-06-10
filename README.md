@@ -4,6 +4,8 @@
 
 ## Installer React JS avec Express JS comme back-end
 
+Ce tutoriel va vous permettre de créer une TODO app avec Express JS, React JS et MongoDB Atlas en évitant les problèmes de cors
+
 - Express sur le port 8080
 - React sur le port 3000
 
@@ -11,9 +13,9 @@
 npx create-vite todo-app --template react
 ```
 
-A noter que `npm run build` crée un dossier `dist` qui contient le code compilé et les fichiers statiques sont dans le dossier `public`.
+A noter que `npm run build` crée un dossier `dist/` qui contient le code compilé et les fichiers statiques qui sont dans le dossier `public/`.
 
-On va maintenant créer un dossier `server/` qui contiendra le code de l'API (back-end ExpressJS) et se placer dans le dossier.
+Créer un dossier `server/` qui contiendra le code de l'API (back-end ExpressJS) et se placer dans le dossier.
 
 ```bash
 mkdir server
@@ -29,9 +31,10 @@ Puis installer les modules suivants
 npm i express
 ```
 
-Dans `app.js` insérer le code suivant :
+Créer les fichers `server/app.js` et `server/.env`  et insérer les lignes code suivant :
 
 ```js
+// server/app.js
 const express = require("express");
 const app = express();
 
@@ -42,10 +45,15 @@ app.listen(PORT, () => {
 });
 ```
 
+```bash
+# server/.env
+PORT=8080
+```
+
 Tester le server avec la commande
 
 ```bash
-node app.js
+node app
 ```
 
 Installer `nodemon`
@@ -58,7 +66,7 @@ Tester le server avec `nodemon`
 nodemon app.js
 ```
 
-Dans `app.js` ajouter les lignes suiavntes et tester le resultat sur le navigateur:
+Dans `server/app.js` ajouter les lignes suivantes et tester le resultat sur le navigateur:
 
 ```js
 // Database
@@ -87,9 +95,12 @@ app.get("/api/tasks", (req, res) => {
 });
 ```
 
-Maintenant on va tenter de fetch les données dans React:
+Le serveur devrait retourner les tâches du tableau `todos`.
 
-```jsimport { useState, useEffect } from "react";
+Maintenant on va tenter de `fetch` les données dans React:
+
+```js
+import { useState, useEffect } from "react";
 function App() {
 
   const [tasks, setTasks] = useState([]);
@@ -121,13 +132,14 @@ export default App;
 ```
 
 Lancer le server de react `npm run dev`
-A ce stade React ecoute le port 3000 et le server sur le port 8080 et cela produira une erreur...
+
+> ⚠️ A ce stade React ecoute le port 5173 et le server envoie les données sur le port 8080 et cela produira une erreur...
 
 Lancer la commande `npm run build`
 
-On peut deplacer le dossier `dist` ( ou `build`) vers le dossie de server ExpressJS `server/`
+Deplacer le dossier `dist` ( ou `build`) généré par react vers le dossier de server ExpressJS `server/dist/`
 
-Insérer les lignes suivantes pour servir le dossier `dist` sur le serveur ExpressJS `server/`
+Insérer les lignes suivantes dans le fichier `server/app.js` pour servir le dossier `dist` via le serveur ExpressJS `server/`
 
 ```js
 const express = require("express");
@@ -139,6 +151,7 @@ app.listen(PORT, () => {
   console.log(`Server started on port: ${PORT}\nvia http://localhost:8080`);
 });
 
+// Servir les fichiers statiques de l'application React build
 app.use(express.static("dist"));
 
 // Database
@@ -167,17 +180,19 @@ app.get("/api/tasks", (req, res) => {
 });
 ```
 
-Express servira le dossier `dist` de react et alors la fonction fetch retournera les donnees de l'API car les fichiers s'executeront sur le meme serveur avec le port `8080`
+Express servira le dossier `dist` de react et alors la fonction `fetch` retournera les donnees de l'API car les fichiers s'executeront sur le meme serveur avec le port `8080`
+
+Dans le dossier `server/` lancer la commande `node app` et tester `http://localhost:8080/api/tasks`
 
 Maintenant ajouter les lignes suivantes dans `server/package.js`
 
 ```js
 "scripts": {
-    "start": "node server.js"
+    "start": "node app"
   },
 ```
 
-Ce sera la commande pour mettre le site en production
+✅ Ce sera la commande pour mettre le site en production
 
 Maintenant pour la version de développement, on va ajouter le code suivant dans `vite.config.js` de react :
 
@@ -203,6 +218,20 @@ export default defineConfig({
 ```
 
 Cela redirigera les requêtes `/api` de react vers le serveur expressJS `server` avec le port `8080`
+
+Maintenant vous pouvez lancer react avec la commande `npm run dev`
+et le serveur ExpressJS dans `server/` avec la commande `npm run dev`
+
+Au final `server/package.json` contiendra:
+
+```json
+  "scripts": {
+    "start": "node app",
+    "dev": "nodemon app"
+  }
+```
+
+Tester `http://localhost:8080/`, vous devriez voir les tâches qui sont affichées
 
 ## Enregistrement des tâches dans la base de données MongoDB
 
@@ -280,7 +309,7 @@ DELETE FROM tasks WHERE id = 1;
 
 🔗 Mongoose documentation : <https://mongoosejs.com/docs/queries.html>
 
-## Créons l'application
+## Application Complète
 
 Commencer par installer Mongoose et dotenv sur le serveur.
 
@@ -289,11 +318,16 @@ npm i mongoose
 npm i dotenv
 ```
 
-### Créer la base de données MongoDB Atlaas
+### Créer la base de données MongoDB Atlas
 
-_A venir_
+![Image de la base de données MongoDB Atlas](./mongoDb-Atlas-1.gif)
 
-🎦 Voir: <https://youtu.be/mDgKjb5eWPk?si=5iEaYhuzUuwOBAZk>
+![Image de la base de données MongoDB Atlas](./mongoDb-Atlas-2.gif)
+
+![Image de la base de données MongoDB Atlas](./mongoDb-Atlas-3.gif)
+
+![Image de la base de données MongoDB Atlas](./mongoDb-Atlas-4.gif)
+
 
 ### Ajouter le code de l'API dans le fichier `server/app.js`
 
@@ -522,7 +556,7 @@ function App() {
 export default App;
 ```
 
-❗ Vérifier `package.json` et `server/package.json` pour voir si les modules sont installeés.
+❗ Vérifier  `server/package.json` pour voir si les modules sont installés.
 
 ```json
 {
@@ -531,7 +565,6 @@ export default App;
     "dev": "nodemon app"
   },
   "dependencies": {
-    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "mongoose": "^8.4.1"
@@ -539,4 +572,22 @@ export default App;
 }
 ```
 
-On utilisera la commande `npm start` pour lancer le serveur en production et la commande `npm dev` pour lancer le serveur en développement.
+On utilisera la commande `npm run start` pour lancer le serveur en production et la commande `npm run dev` pour lancer le serveur en développement.
+
+## Déployer votre application avec Render
+
+Rendez-vous sur [Render](https://render.com/) : <https://render.com/>
+
+1. Vous pouvez créer un compte rapidement en vous connectant avec les identifiants de votre compte GitHub
+
+2. Choisissez +New > Web Service
+
+3. Nommez votre projet et configuer les commandes nessaisaires pour deployer votre application.
+
+    - Build Command: `npm install ; npm run build ; cd server ; npm install`
+    - Start Command: `cd server ; npm run start`
+
+![Render settings](./render_settings.png)
+
+![Render env](./render_env.png)
+
