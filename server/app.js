@@ -1,3 +1,4 @@
+// server/app.js
 const express = require("express"); // Importation du module Express
 const mongoose = require("mongoose"); // Importation du module Mongoose pour interagir avec MongoDB
 const dotenv = require("dotenv"); // Importation du module dotenv pour gérer les variables d'environnement
