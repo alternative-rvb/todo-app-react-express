@@ -13,11 +13,13 @@ export default defineConfig(({ mode }) => {
       outDir: resolve(__dirname, './server/dist'),
     },
     define: {
-      'process.env': env
+      'process.env': {
+        VITE_API_URL: env.VITE_API_URL
+      }
     },
     server: {
       proxy: {
-        // Utiliser la variable d'environnement pour configurer le proxy
+        // Utiliser la variable d'environnement pour configurer le proxy en développement
         '/api': {
           target: env.VITE_API_URL,
           changeOrigin: true,

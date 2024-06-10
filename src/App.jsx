@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import "./app.css";
 
+// Utiliser la variable d'environnement pour l'URL de l'API
 const API_URL = process.env.VITE_API_URL;
 
 function App() {
