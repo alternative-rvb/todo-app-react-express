@@ -3,15 +3,15 @@ import { useState, useEffect } from "react";
 import "./app.css";
 
 // Utiliser la variable d'environnement pour l'URL de l'API
-const API_URL = process.env.VITE_API_URL;
-console.log('API_URL:', API_URL)
+// const API_URL = process.env.VITE_API_URL;
+// console.log('API_URL:', API_URL)
 
 function App() {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
 
   useEffect(() => {
-    fetch(`${API_URL}/api/tasks`)
+    fetch(`/api/tasks`)
       .then((res) => res.json())
       .then((data) => {
         setTasks(data);
@@ -23,7 +23,7 @@ function App() {
       alert("Please enter a task");
       return;
     }
-    fetch(`${API_URL}/api/tasks`, {
+    fetch(`/api/tasks`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,7 +39,7 @@ function App() {
 
   function handleToggleTask(id) {
     const task = tasks.find((task) => task._id === id);
-    fetch(`${API_URL}/api/tasks/${id}`, {
+    fetch(`/api/tasks/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +53,7 @@ function App() {
   }
 
   function handleDeleteTask(id) {
-    fetch(`${API_URL}/api/tasks/${id}`, { method: "DELETE" }).then(() => {
+    fetch(`/api/tasks/${id}`, { method: "DELETE" }).then(() => {
       setTasks(tasks.filter((task) => task._id !== id));
     });
   }
