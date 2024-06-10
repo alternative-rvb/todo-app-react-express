@@ -2,12 +2,14 @@
 import { useState, useEffect } from "react";
 import "./app.css";
 
+const API_URL = process.env.VITE_API_URL;
+
 function App() {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
 
   useEffect(() => {
-    fetch("/api/tasks")
+    fetch(`${API_URL}/api/tasks`)
       .then((res) => res.json())
       .then((data) => {
         setTasks(data);
@@ -19,7 +21,7 @@ function App() {
       alert("Please enter a task");
       return;
     }
-    fetch("/api/tasks", {
+    fetch(`${API_URL}/api/tasks`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -35,7 +37,7 @@ function App() {
 
   function handleToggleTask(id) {
     const task = tasks.find((task) => task._id === id);
-    fetch(`/api/tasks/${id}`, {
+    fetch(`${API_URL}/api/tasks/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -49,7 +51,7 @@ function App() {
   }
 
   function handleDeleteTask(id) {
-    fetch(`/api/tasks/${id}`, { method: "DELETE" }).then(() => {
+    fetch(`${API_URL}/api/tasks/${id}`, { method: "DELETE" }).then(() => {
       setTasks(tasks.filter((task) => task._id !== id));
     });
   }

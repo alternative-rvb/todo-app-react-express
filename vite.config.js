@@ -12,6 +12,9 @@ export default defineConfig(({ mode }) => {
       // Chemin où les fichiers de production seront générés
       outDir: resolve(__dirname, './server/dist'),
     },
+    define: {
+      'process.env': env
+    },
     server: {
       proxy: {
         // Utiliser la variable d'environnement pour configurer le proxy
