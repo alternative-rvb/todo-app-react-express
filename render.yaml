@@ -7,5 +7,5 @@ services:
     buildCommand: npm install && npm run build && cd server && npm install
     startCommand: cd server && npm start
     envVars:
-      - key: MONGO_URI
+      - fromGroup: YOUR_ENVIRONMENT_GROUP
 
