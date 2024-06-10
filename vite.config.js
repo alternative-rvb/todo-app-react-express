@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
+// https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   // Charger les variables d'environnement en fonction du mode (développement ou production)
   const env = loadEnv(mode, process.cwd());
@@ -13,19 +14,7 @@ export default defineConfig(({ mode }) => {
       outDir: resolve(__dirname, './server/dist'),
     },
     define: {
-      'process.env': {
-        VITE_API_URL: env.VITE_API_URL
-      }
-    },
-    server: {
-      proxy: {
-        // Utiliser la variable d'environnement pour configurer le proxy en développement
-        '/api': {
-          target: env.VITE_API_URL,
-          changeOrigin: true,
-          secure: false,
-        },
-      },
-    },
+      'process.env': env
+    }
   };
 });
