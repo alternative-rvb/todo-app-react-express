@@ -36,18 +36,18 @@ const Task = mongoose.model("Task", taskSchema);
 
 // Logger
 
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`); // Log la méthode et l'URL
-  console.log(req.body); // Log le corps de la requête
+// app.use((req, res, next) => {
+//   console.log(`${req.method} ${req.url}`); // Log la méthode et l'URL
+//   console.log(req.body); // Log le corps de la requête
   
-  const oldSend = res.send;
-  res.send = function (data) {
-    console.log(`Response status: ${res.statusCode}`); // Log le statut de la réponse
-    console.log(data); // Log les données de la réponse
-    oldSend.call(this, data);
-  }
-  next();
-});
+//   const oldSend = res.send;
+//   res.send = function (data) {
+//     console.log(`Response status: ${res.statusCode}`); // Log le statut de la réponse
+//     console.log(data); // Log les données de la réponse
+//     oldSend.call(this, data);
+//   }
+//   next();
+// });
 
 
 // Routes CRUD
