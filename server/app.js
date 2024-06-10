@@ -11,7 +11,7 @@ dotenv.config();
 
 // Utiliser le middleware CORS
 app.use(cors({
-  origin: '*' // Remplacer '*' par l'URL de votre frontend pour plus de sécurité
+  origin: process.env.CLIENT_ORIGIN || '*' // Remplacer '*' par l'URL de votre frontend pour plus de sécurité
 }));
 
 // Utiliser le middleware pour analyser les requêtes JSON
