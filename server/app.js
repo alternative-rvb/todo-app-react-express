@@ -1,14 +1,18 @@
-// server/app.js
-
 const express = require("express"); // Importation du module Express
 const mongoose = require("mongoose"); // Importation du module Mongoose pour interagir avec MongoDB
 const dotenv = require("dotenv"); // Importation du module dotenv pour gérer les variables d'environnement
 const path = require("path"); // Importation du module path pour gérer les chemins de fichiers
+const cors = require("cors"); // Importation du middleware CORS
 
 const app = express(); // Création de l'application Express
 
 // Charger les variables d'environnement depuis le fichier .env
 dotenv.config();
+
+// Utiliser le middleware CORS
+app.use(cors({
+  origin: '*' // Remplacer '*' par l'URL de votre frontend pour plus de sécurité
+}));
 
 // Utiliser le middleware pour analyser les requêtes JSON
 app.use(express.json());
@@ -113,5 +117,3 @@ app.use(express.static("dist"));
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "dist", "index.html"));
 });
-
-
