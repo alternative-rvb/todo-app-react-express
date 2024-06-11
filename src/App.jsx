@@ -48,7 +48,6 @@ function App() {
     })
       .then((res) => res.json())
       .then((updatedTask) => {
-        console.log('updatedTask:', updatedTask)
         setTasks((prevTasks) => prevTasks.map((task) => (task._id === id ? { ...updatedTask, completed: !updatedTask.completed } : task)));
       });
   }
