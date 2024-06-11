@@ -1,120 +1,118 @@
-// server/app.js
-const express = require("express"); // Importation du module Express
-const mongoose = require("mongoose"); // Importation du module Mongoose pour interagir avec MongoDB
-const dotenv = require("dotenv"); // Importation du module dotenv pour gérer les variables d'environnement
-const path = require("path"); // Importation du module path pour gérer les chemins de fichiers
-// const cors = require("cors"); // Importation du middleware CORS
+const express = require("express");
+const { MongoClient, ObjectId } = require("mongodb");
+const dotenv = require("dotenv");
+const path = require("path");
 
-const app = express(); // Création de l'application Express
-
-// Charger les variables d'environnement depuis le fichier .env
+const app = express();
 dotenv.config();
 
-// Utiliser le middleware CORS
-// app.use(cors({
-//   origin: '*' // Remplacer '*' par l'URL de votre frontend pour plus de sécurité
-// }));
-
-// Utiliser le middleware pour analyser les requêtes JSON
+// Middleware pour analyser les corps JSON des requêtes
 app.use(express.json());
 
-const PORT = process.env.PORT || 8080; // Définir le port sur lequel le serveur écoute, par défaut 8080
+const PORT = process.env.PORT || 8080;
+let db, tasksCollection;
 
-// Connecter à MongoDB Atlas en utilisant la chaîne de connexion depuis le fichier .env
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("Connected to MongoDB Atlas"))
-  .catch((error) => console.error("MongoDB connection error:", error));
+// Connexion à MongoDB Atlas en utilisant le client natif MongoDB
+MongoClient.connect(process.env.MONGO_URI)
+  .then((client) => {
+    console.log("Connecté à MongoDB Atlas");
+    db = client.db(); // Obtenir l'objet de la base de données
+    tasksCollection = db.collection("tasks"); // Accéder ou créer la collection des tâches
+  })
+  .catch((error) => console.error("Erreur de connexion à MongoDB:", error));
 
-// Définir le schéma de tâche pour MongoDB
-const taskSchema = new mongoose.Schema({
-  title: String, // Titre de la tâche
-  completed: Boolean // Statut de la tâche (complétée ou non)
+// Logger middleware pour logger chaque requête
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  console.log("***", req.body);
+  const oldSend = res.send;
+  res.send = function (data) {
+    console.log(`Statut de la réponse: ${res.statusCode}`, data);
+    oldSend.call(this, data);
+  }
+  next();
 });
 
-// Créer le modèle Task basé sur le schéma de tâche
-const Task = mongoose.model("Task", taskSchema);
+// Opérations CRUD
 
-// Logger
-
-// app.use((req, res, next) => {
-//   console.log(`${req.method} ${req.url}`); // Log la méthode et l'URL
-//   console.log(req.body); // Log le corps de la requête
-  
-//   const oldSend = res.send;
-//   res.send = function (data) {
-//     console.log(`Response status: ${res.statusCode}`); // Log le statut de la réponse
-//     console.log(data); // Log les données de la réponse
-//     oldSend.call(this, data);
-//   }
-//   next();
-// });
-
-
-// Routes CRUD
-
-// Route pour obtenir toutes les tâches
+// GET : Récupérer toutes les tâches
 app.get("/api/tasks", async (req, res) => {
   try {
-    // Trouver toutes les tâches dans la collection tasks
-    const tasks = await Task.find();
-    // Envoyer les tâches trouvées en réponse
+    const tasks = await tasksCollection.find().toArray(); // Récupérer tous les documents
     res.json(tasks);
   } catch (error) {
-    // En cas d'erreur, envoyer un statut 500 avec le message d'erreur
-    res.status(500).send(error.message);
+    res.status(500).json({ message: "Échec de la récupération des tâches." });
   }
 });
 
-// Route pour créer une nouvelle tâche
+// POST : Créer une nouvelle tâche
 app.post("/api/tasks", async (req, res) => {
   try {
-    // Créer une nouvelle instance de Task avec les données du corps de la requête
-    const newTask = new Task(req.body);
-    // Sauvegarder la nouvelle tâche dans la base de données
-    await newTask.save();
-    // Envoyer la tâche créée avec un statut 201 (Created)
-    res.status(201).json(newTask);
+    const newTask = req.body;
+    const result = await tasksCollection.insertOne(newTask); // Insérer un nouveau document
+    res.status(201).json({ ...newTask, _id: result.insertedId }); // Répondre avec la tâche créée
   } catch (error) {
-    // En cas d'erreur, envoyer un statut 400 avec le message d'erreur
-    res.status(400).send(error.message);
+    res.status(400).json({ message: "Échec de la création de la tâche." });
   }
 });
 
-// Route pour mettre à jour une tâche
+// PUT : Mettre à jour une tâche par ID
 app.put("/api/tasks/:id", async (req, res) => {
   try {
-    // Trouver la tâche par ID et mettre à jour avec les nouvelles données
-    const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    // Envoyer la tâche mise à jour en réponse
-    res.json(updatedTask);
+    const { id } = req.params;
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Format d'ID invalide" }); // Valider l'ID
+    }
+
+    const objectId = new ObjectId(id);
+    const updatedTask = req.body;
+    delete updatedTask._id; // Empêcher le client de changer le _id
+
+    const result = await tasksCollection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: updatedTask }
+    );
+    if (result) {
+      res.json(result);  // Envoie le document mis à jour
+    } else {
+      res.status(404).json({ message: "Task not found" });
+    }
   } catch (error) {
-    // En cas d'erreur, envoyer un statut 400 avec le message d'erreur
-    res.status(400).send(error.message);
+    console.error('Erreur lors de la mise à jour:', error);
+    res.status(400).json({ message: error.message });
   }
 });
 
-// Route pour supprimer une tâche
+// DELETE : Supprimer une tâche par ID
 app.delete("/api/tasks/:id", async (req, res) => {
   try {
-    // Trouver la tâche par ID et la supprimer de la base de données
-    await Task.findByIdAndDelete(req.params.id);
-    // Envoyer un statut 204 (No Content) pour indiquer que la suppression a réussi
-    res.status(204).send();
+    const { id } = req.params;
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Format d'ID invalide" });
+    }
+
+    const objectId = new ObjectId(id);
+    const result = await tasksCollection.deleteOne({ _id: objectId });
+    if (result.deletedCount === 1) {
+      res.status(204).send(); // Aucun contenu à renvoyer
+    } else {
+      res.status(404).json({ message: "Tâche non trouvée" });
+    }
   } catch (error) {
-    // En cas d'erreur, envoyer un statut 400 avec le message d'erreur
-    res.status(400).send(error.message);
+    console.error('Erreur lors de la suppression:', error);
+    res.status(400).json({ message: error.message });
   }
 });
 
-// Démarrer le serveur et écouter sur le port spécifié
+// Démarrer le serveur et écouter sur le port configuré
 app.listen(PORT, () => {
-  console.log(`Server started on port: ${PORT}\nvia http://localhost:${PORT}`);
+  console.log(`Serveur démarré sur le port : ${PORT}`);
 });
 
-// Servir les fichiers statiques de l'application React build
+// Servir les fichiers statiques de l'application React
 app.use(express.static("dist"));
 
-// Rediriger toutes les autres requêtes vers index.html pour gérer le routage côté client avec React Router
+// Rediriger toutes les autres requêtes vers index.html pour la gestion du routage côté client
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "dist", "index.html"));
 });
