@@ -287,10 +287,12 @@ MongoClient.connect(process.env.MONGO_URI)
 // Logger middleware pour logger chaque requête
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
-  console.log("***", req.body);
+  console.log("↖️  req.body: ")
+  console.log(req.body);
   const oldSend = res.send;
   res.send = function (data) {
-    console.log(`Statut de la réponse: ${res.statusCode}`, data);
+    console.log( '↘️ ', `Status: ${res.statusCode}`);
+    if (data) console.log(JSON.parse(data));
     oldSend.call(this, data);
   }
   next();
@@ -380,10 +382,10 @@ app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "dist", "index.html"));
 });
 
+
 ```
 
 ### Ajouter le code dans react
-
 
 ```js	
 // src/App.jsx
