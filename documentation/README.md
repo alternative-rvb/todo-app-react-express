@@ -233,21 +233,9 @@ Au final `server/package.json` contiendra:
 
 Tester `http://localhost:8080/`, vous devriez voir les tâches qui sont affichées
 
-## Enregistrement des tâches dans la base de données MongoDB
-
-https://youtu.be/ofme2o29ngU?si=71NwVst-yrlySdRV
-
-
-## Application Complète
-
-Commencer par installer MongoDB et dotenv sur le serveur.
-
-```bash
-npm i mongodb
-npm i dotenv
-```
-
 ### Créer la base de données MongoDB Atlas
+
+Dans cette partie on va utiliser MongoDB Atlas pour créer la base de données de l'application et crée une collection de tâches.
 
 ![Image de la base de données MongoDB Atlas](./images/mongoDb-Atlas-1.gif)
 
@@ -257,6 +245,21 @@ npm i dotenv
 
 ![Image de la base de données MongoDB Atlas](./images/mongoDb-Atlas-4.gif)
 
+## Enregistrement des tâches dans la base de données MongoDB
+
+- Apprendre les commandes MongoDB (requêtes) pour ajouter des tâches à la base de données MongoDB : <https://youtu.be/ofme2o29ngU?si=71NwVst-yrlySdRV>
+- Opérations de CRUD avec MongoDB et Express : <https://youtu.be/ObkVmnr8B9k?si=_-eZJYsHxo0-Yabm>
+
+## Application Complète
+
+Commencer par installer MongoDB et dotenv sur le serveur.
+
+Maintenant essayer de gérer les tâches dans l'application et enregistrer les tâches dans la base de données MongoDB.
+
+```bash
+npm i mongodb
+npm i dotenv
+```
 
 ### Ajouter le code de l'API dans le fichier `server/app.js`
 
