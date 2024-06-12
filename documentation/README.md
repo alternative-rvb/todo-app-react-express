@@ -534,3 +534,15 @@ Rendez-vous sur [Render](https://render.com/) : <https://render.com/>
 
 ![Render env](./images/render_env.png)
 
+
+## Déployer votre application avec ALWAYSDATA
+
+https://blog.alwaysdata.com/fr/2018/02/05/deployer-sans-peine-avec-git-hooks/
+
+## Déployer votre application frontend avec Vercel
+
+A venir
+
+## Déployer votre application frontend avec Netlify
+
+A venir
