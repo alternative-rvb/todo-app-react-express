@@ -250,6 +250,8 @@ Dans cette partie on va utiliser MongoDB Atlas pour créer la base de données d
 - Apprendre les commandes MongoDB (requêtes) pour ajouter des tâches à la base de données MongoDB : <https://youtu.be/ofme2o29ngU?si=71NwVst-yrlySdRV>
 - Opérations de CRUD avec MongoDB et Express : <https://youtu.be/ObkVmnr8B9k?si=_-eZJYsHxo0-Yabm>
 
+Voir aussi document Annexe [./mongodb.md](./mongodb.md)
+
 ## Application Complète
 
 Commencer par installer MongoDB et dotenv sur le serveur.

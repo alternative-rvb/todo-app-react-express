@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Je vais vous expliquer les différences entre MySQL et MongoDB, ainsi que les concepts clés pour comprendre MongoDB, Atlas et Mongoose. Cela vous aidera à mieux appréhender l'environnement et à faire la transition pour votre projet.
+Je vais vous expliquer les différences entre MySQL et MongoDB, ainsi que les concepts clés pour comprendre MongoDB et Atlas. Cela vous aidera à mieux appréhender l'environnement et à faire la transition pour votre projet.
 
 ### Différences entre MySQL et MongoDB
 
@@ -29,7 +29,6 @@ Je vais vous expliquer les différences entre MySQL et MongoDB, ainsi que les co
 
 - **MongoDB** : Stockera vos données.
 - **MongoDB Atlas** : Hébergera votre base de données MongoDB dans le cloud.
-- **Mongoose** : Facilitera les interactions entre votre application Node.js et MongoDB.
 
 ### Concepts de MongoDB Atlas
 
@@ -40,14 +39,8 @@ Je vais vous expliquer les différences entre MySQL et MongoDB, ainsi que les co
 
 ### Stockage des Données
 
-- **MySQL** :
-- **Table** : Ensemble structuré de lignes (enregistrements) et de colonnes (champs).
-- **Row (Ligne)** : Un enregistrement dans une table.
-- **Column (Colonne)** : Champ dans une table.
-- **MongoDB** :
-- **Collection** : Ensemble de documents.
-- **Document** : Objet JSON contenant les données.
-- Les documents dans une collection peuvent avoir des champs différents, ce qui offre plus de flexibilité.
+- **MySQL** : - **Table** : Ensemble structuré de lignes (enregistrements) et de colonnes (champs). - **Row (Ligne)** : Un enregistrement dans une table. - **Column (Colonne)** : Champ dans une table.
+- **MongoDB** : - **Collection** : Ensemble de documents. - **Document** : Objet JSON contenant les données. - Les documents dans une collection peuvent avoir des champs différents, ce qui offre plus de flexibilité.
 
 ### Exemple de Conversion
 
@@ -70,88 +63,133 @@ Je vais vous expliquer les différences entre MySQL et MongoDB, ainsi que les co
 
 En résumé, vous utiliserez MongoDB pour stocker vos données, MongoDB Atlas pour héberger votre base de données dans le cloud, et Mongoose pour faciliter les interactions avec MongoDB depuis votre application Node.js. Les clusters dans Atlas permettent de gérer la redondance et la scalabilité, les bases de données contiennent les collections, et les collections contiennent les documents, offrant une grande flexibilité par rapport aux tables relationnelles de MySQL.
 
-## Comparaison entre Mongoose et Sequelize
+## Tester MongoDB avec Mongosh
 
-#### Type de base de données
+### Installation de mongosh pour Windows
 
--   **Mongoose** :
-    -   ODM pour MongoDB (base de données NoSQL).
-    -   Conçu pour gérer des documents JSON stockés dans des collections.
--   **Sequelize** :
-    -   ORM (Object-Relational Mapping) pour les bases de données SQL (telles que MySQL, PostgreSQL, SQLite, et MSSQL).
-    -   Conçu pour mapper les objets JavaScript à des tables relationnelles.
+1. **Télécharger mongosh** :
 
+- Accédez à la [page de téléchargement de MongoDB Shell (mongosh)](https://www.mongodb.com/try/download/shell) .
+- Sélectionnez la version pour Windows et téléchargez l'installateur.
 
-### Introduction à Mongoose comme ODM
+2. **Installation** :
 
-Mongoose est un ODM (Object Data Modeling) populaire pour MongoDB et Node.js. Il fournit une solution simple pour modeler vos données et inclut des outils intégrés pour la validation, la requête, l'indexation, et plus encore. En utilisant Mongoose, vous pouvez structurer vos données avec des schémas fortement typés et facilement manipuler les données de MongoDB avec des méthodes de haut niveau.
+- Exécutez le fichier téléchargé et suivez les instructions d'installation.
 
-Mongoose rend le travail avec MongoDB plus intuitif en rapprochant le monde non relationnel de MongoDB des concepts plus traditionnels des bases de données relationnelles, tels que les schémas rigides et les relations entre les données. En offrant une abstraction riche, Mongoose permet aux développeurs de se concentrer sur l'amélioration des fonctionnalités de l'application plutôt que sur les détails de la gestion bas niveau de la base de données.
+### Connexion à une base de données MongoDB Atlas
 
-### Parallèle avec les Requêtes SQL
+Pour vous connecter à une base de données MongoDB Atlas, suivez ces étapes :
 
-Pour mieux comprendre les opérations CRUD (Create, Read, Update, Delete) réalisées dans le projet avec Mongoose, voyons comment elles se comparent aux requêtes SQL typiques utilisées dans les bases de données relationnelles :
+1. **Obtenez l'URI de connexion** :
 
-#### 1. Lire des Données (Read) 
+- Connectez-vous à votre compte MongoDB Atlas.
+- Sélectionnez le cluster auquel vous voulez vous connecter.
+- Cliquez sur "Connect", puis sur "Connect using MongoDB Shell".
+- Copiez l'URI de connexion. Il ressemblera à ceci :
 
-- **Mongoose**  :
+```php
+mongodb+srv://<username>:<password>@cluster0.mongodb.net/<dbname>?retryWrites=true&w=majority
+```
+
+2. **Se connecter via mongosh** :
+
+- Ouvrez une ligne de commande (cmd ou PowerShell).
+- Exécutez la commande suivante en remplaçant `<username>`, `<password>`, et `<dbname>` par vos informations :
+
+```shell
+mongosh "mongodb+srv://<username>:<password>@cluster0.mongodb.net/<dbname>?retryWrites=true&w=majority"
+```
+
+### Commandes MongoDB utiles
+
+#### 1. Insertion de documents
 
 ```javascript
-const tasks = await Task.find();
+// Insertion d'un seul document
+db.users.insertOne({
+  firstName: "John",
+  lastName: "Doe",
+  email: "john.doe@example.com",
+  password: "password123",
+  role: "user",
+});
+
+// Insertion de plusieurs documents
+db.users.insertMany([
+  {
+    firstName: "Jane",
+    lastName: "Smith",
+    email: "jane.smith@example.com",
+    password: "password456",
+    role: "admin",
+  },
+  {
+    firstName: "Alice",
+    lastName: "Johnson",
+    email: "alice.johnson@example.com",
+    password: "password789",
+    role: "user",
+  },
+]);
 ```
 
-Cette commande récupère toutes les tâches de la collection MongoDB. Elle est équivalente à une requête SQL qui sélectionnerait toutes les colonnes de toutes les lignes d'une table. 
-
-- **SQL équivalent**  :
-
-```sql
-SELECT * FROM tasks;
-```
-#### 2. Créer des Données (Create) 
-
-- **Mongoose**  :
+#### 2. Lecture de documents
 
 ```javascript
-const newTask = new Task(req.body);
-await newTask.save();
+// Lecture de tous les documents
+db.users.find().pretty();
+
+// Lecture d'un seul document
+db.users.findOne({ email: "john.doe@example.com" });
+
+// Lecture avec une condition
+db.users.find({ role: "user" }).pretty();
 ```
 
-Ici, un nouvel objet `Task` est créé en utilisant les données reçues dans le corps de la requête (`req.body`) et est ensuite enregistré dans la base de données. C'est similaire à une insertion en SQL. 
-- **SQL équivalent**  :
-
-```sql
-INSERT INTO tasks (title, completed) VALUES ('new title', false);
-```
-
-#### 3. Mettre à jour des Données (Update) 
-
-- **Mongoose**  :
+#### 3. Mise à jour de documents
 
 ```javascript
-const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
+// Mise à jour d'un seul document
+db.users.updateOne(
+  { email: "john.doe@example.com" },
+  { $set: { password: "newpassword123" } }
+);
+
+// Mise à jour de plusieurs documents
+db.users.updateMany({ role: "user" }, { $set: { role: "member" } });
 ```
 
-Cette commande cherche une tâche par son identifiant et met à jour ses propriétés avec les nouvelles valeurs fournies, renvoyant la tâche mise à jour. L'option `{ new: true }` indique que la méthode doit renvoyer l'objet après mise à jour. 
-
-- **SQL équivalent**  :
-
-```sql
-UPDATE tasks SET title = 'updated title', completed = true WHERE id = 1;
-```
-#### 4. Supprimer des Données (Delete) 
-
-- **Mongoose**  :
+#### 4. Suppression de documents
 
 ```javascript
-await Task.findByIdAndDelete(req.params.id);
+// Suppression d'un seul document
+db.users.deleteOne({ email: "john.doe@example.com" });
+
+// Suppression de plusieurs documents
+db.users.deleteMany({ role: "member" });
 ```
 
-Cette méthode trouve une tâche par son ID et la supprime de la base de données, ce qui est similaire à une commande DELETE en SQL. 
+#### 5. Indexation
 
-- **SQL équivalent**  :
+```javascript
+// Création d'un index sur le champ email
+db.users.createIndex({ email: 1 });
 
-```sql
-DELETE FROM tasks WHERE id = 1;
+// Création d'un index unique sur le champ email
+db.users.createIndex({ email: 1 }, { unique: true });
 ```
 
-🔗 Mongoose documentation : <https://mongoosejs.com/docs/queries.html>
+#### 6. Agrégation
+
+```javascript
+// Agrégation pour compter le nombre d'utilisateurs par rôle
+db.users.aggregate([{ $group: { _id: "$role", count: { $sum: 1 } } }]);
+
+// Agrégation pour filtrer et projeter des champs spécifiques
+db.users.aggregate([
+  { $match: { role: "admin" } },
+  { $project: { firstName: 1, lastName: 1, _id: 0 } },
+]);
+```
+
+Ces commandes vous permettront de réaliser les opérations de base sur votre collection `users`. Assurez-vous de toujours tester ces commandes dans un environnement de développement avant de les exécuter en production.
